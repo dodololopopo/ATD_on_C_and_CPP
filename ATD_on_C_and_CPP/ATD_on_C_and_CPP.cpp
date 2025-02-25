@@ -203,3 +203,94 @@ void input_fine(struct Fine* fine, struct Reader* fined) {
 
 	init_fine(fine, id, fined->id, amount, reason);
 }
+
+
+//вывод автора
+void output_author(struct Author* toprint) {
+	puts("Автор:");
+	printf("  Имя - %s\n", toprint->name);
+	printf("  Дата рождения - %s\n", toprint->birthdate);
+	printf("  ID автора - %06d\n", toprint->id);
+	if (toprint->books_count) {
+		printf("  ID книг:\n");
+		for (int i = 0; i < toprint->books_count; i++) {
+			printf("    - %06d\n", toprint->book_ids[i]);
+		}
+	}
+	else printf("  Нет книг от данного автора\n");
+	puts("");
+}
+
+
+//вывод книги
+void output_book(struct Book* toprint) {
+	puts("Книга:");
+	printf("  Название - %s\n", toprint->title);
+	printf("  Год публикации - %s\n", toprint->published_year);
+	printf("  ID книги - %06d\n", toprint->id);
+	printf("  ID автора - %06d\n", toprint->author_id);
+	printf("  Статус - ");
+	if (toprint->is_available == 1) {
+		printf("Доступна\n");
+	}
+	else {
+		printf("Не доступна\n");
+	}
+	puts("");
+}
+
+
+//вывод читателя
+void output_reader(struct Reader* toprint) {
+	puts("Читатель:");
+	printf("  Имя - %s\n", toprint->name);
+	printf("  Почта - %s\n", toprint->email);
+	printf("  ID читателя - %06d\n", toprint->id);
+	printf("  ID занятой книги - ");
+	if (toprint->borrowed_book_id == 0) printf("Книг не занято\n");
+	else printf("%06d\n", toprint->borrowed_book_id);
+	puts("");
+}
+
+
+//вывод запроса
+void output_order(struct Order* toprint) {
+	puts("Запрос:");
+	printf("  ID запроса - %06d\n", toprint->id);
+	printf("  ID книги - %06d\n", toprint->book_id);
+	printf("  ID читателя - %06d\n", toprint->reader_id);
+	printf("  Дата запроса - %s\n", toprint->orderdate);
+	printf("  Дата возврата - %s\n", toprint->returndate);
+	puts("");
+}
+
+
+//вывод штрафа
+void output_fine(struct Fine* toprint) {
+	puts("Штраф:");
+	printf("  ID штрафа - %06d\n", toprint->id);
+	printf("  ID читателя - %06d\n", toprint->reader_id);
+	printf("  Объем штрафа - %d $\n", toprint->amount);
+	printf("  Причина - %s\n", toprint->reason);
+	puts("");
+}
+
+
+//бизнес логика книги
+void edit_book(struct Book* editable, int status) {
+	editable->is_available = status;
+}
+
+
+//бизнес логика запроса
+void edit_order(struct Order* editable, const char* date_of_return, struct Reader* reader, struct Book* book) {
+	strcpy(editable->returndate, date_of_return);
+	reader->borrowed_book_id = 0;
+	edit_book(book, 1);
+}
+
+
+//бизнес логика штрафа
+void edit_fine(struct Fine* editable) {
+	editable->is_paid = 1;
+}
