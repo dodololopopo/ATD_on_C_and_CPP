@@ -173,3 +173,94 @@ public:
         return id;
     }
 };
+
+class Order {
+private:
+    int id;                             //id запроса
+    int reader_id;                      //id читателя
+    int book_id;                        //id запрашиваемой
+    char orderdate[DDMMYYYY_LENTH];     //дата запроса
+    char returndate[DDMMYYYY_LENTH];    //дата возврата
+
+public:
+    Order() {
+        strcpy(returndate, "unreturned");
+    }
+
+    //ввод запроса
+    void input(int reader_id, int book_id) {
+        this->reader_id = reader_id;
+        this->book_id = book_id;
+
+        std::cout << "[  Запрос  ]\n" << "Введите id запроса: ";
+        std::cin >> id;
+        std::cin.ignore();
+
+        std::cout << "дата запроса дд.мм.гггг: ";
+        std::cin.getline(orderdate, DDMMYYYY_LENTH);
+    }
+
+    //вывод запроса
+    void output() const {
+        std::cout << "Запрос:\n";
+        std::cout << "  ID запроса - " << id << "\n";
+        std::cout << "  ID книги - " << book_id << "\n";
+        std::cout << "  ID читателя - " << reader_id << "\n";
+        std::cout << "  Дата запроса - " << orderdate << "\n";
+        std::cout << "  Дата возврата - " << returndate << "\n\n";
+    }
+
+    //добавление даты возврата
+    void edit(const char* return_date) {
+        strcpy(returndate, return_date);
+    }
+};
+
+class Fine {
+private:
+    int id;         //id штрафа
+    int reader_id;  //id читателя
+    int amount;     //размер штрафа
+    bool is_paid;   //оплачен ли штраф
+    char* reason;   //причина штрафа
+
+public:
+    Fine() : reason(nullptr), is_paid(false) {}
+
+    ~Fine() {
+        free(reason);
+    }
+
+    //ввод штрафа
+    void input(int reader_id) {
+        this->reader_id = reader_id;
+
+        std::cout << "[  Штраф  ]\n" << "Введите объем штрафа: ";
+        std::cin >> amount;
+
+        std::cout << "Введите id штрафа: ";
+        std::cin >> id;
+        std::cin.ignore();
+
+        char temp_reason[150];
+        std::cout << "Причина штрафа: ";
+        std::cin.getline(temp_reason, 150);
+        reason = (char*)malloc(strlen(temp_reason) + 1);
+        strcpy(reason, temp_reason);
+    }
+
+    //вывод штрафа
+    void output() const {
+        std::cout << "Штраф:\n";
+        std::cout << "  ID штрафа - " << id << "\n";
+        std::cout << "  ID читателя - " << reader_id << "\n";
+        std::cout << "  Объем штрафа - " << amount << " $\n";
+        std::cout << "  Статус  - " << (is_paid ? "Оплачен" : "Не оплачен") << "\n";
+        std::cout << "  Причина - " << reason << "\n\n";
+    }
+
+    //присвоение статуса "оплачен"
+    void edit() {
+        is_paid = true;
+    }
+};
