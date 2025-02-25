@@ -296,53 +296,47 @@ void edit_fine(struct Fine* editable) {
 }
 
 
-int main() {
-	int hwmnybooks;
+int main()
+{
 	setlocale(LC_ALL, "Rus");
 
-	Author Lary;
-	Lary.input();
-	Lary.output();
+	struct Author Lary;
+	input_author(&Lary);
+	output_author(&Lary);
 
-	std::cout << "Солько добавить книг?: ";
-	std::cin >> hwmnybooks;
-	std::cin.ignore();
+	struct Book* Gary = (struct Book*)malloc(sizeof(struct Book));
+	struct Book* Hary = (struct Book*)malloc(sizeof(struct Book));
+	input_book(Gary, &Lary);
+	output_book(Gary);
+	puts("Сделаем книгу не доступной и обратно:");
+	edit_book(Gary, 0);
+	output_book(Gary);
+	edit_book(Gary, 1);
+	output_book(Gary);
+	input_book(Hary, &Lary);
+	output_book(Hary);
+	output_author(&Lary);
 
-	Book* Gary = new Book[hwmnybooks];
-	for (int i = 0; i < hwmnybooks; ++i) {
-		std::cout << "N" << (i + 1) << ": ";
-		Gary[i].input(Lary.getId());
-		Lary.addBook(Gary[i].getId()); // Добавление книги к автору
-	}
+	struct Reader Mary;
+	input_reader(&Mary);
+	output_reader(&Mary);
 
-	// Вывод данных всех книг
-	for (int i = 0; i < hwmnybooks; ++i) {
-		Gary[i].output();
-	}
-	Lary.output();
+	struct Order Pery;
+	input_order(&Pery, Gary, &Mary);
+	output_order(&Pery);
+	output_reader(&Mary);
+	output_book(Gary);
+	puts("Закроем запрос. Изменит статус книги и id занятой книги у читателя");
+	edit_order(&Pery, "21.11.2121", &Mary, Gary);
+	output_order(&Pery);
+	output_reader(&Mary);
+	output_book(Gary);
 
-	Reader Mary;
-	Mary.input();
-	Mary.output();
-
-	Order Pery;
-	Pery.input(Mary.getId(), Gary->getId());
-	Pery.output();
-
-	// Пример редактирования заказа
-	Pery.edit("21.11.2121");
-	Pery.output();
-
-	Fine Jery;
-	Jery.input(Mary.getId());
-	Jery.output();
-
-	// Пример редактирования штрафа
-	Jery.edit();
-	Jery.output();
-
-	// Освобождение памяти
-	delete[] Gary;
-
+	struct Fine Jery;
+	input_fine(&Jery, &Mary);
+	output_fine(&Jery);
+	puts("Присвоим штрафу статус оплаченного");
+	edit_fine(&Jery);
+	output_fine(&Jery);
 	return 0;
 }
