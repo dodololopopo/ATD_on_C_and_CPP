@@ -129,6 +129,9 @@
   <ItemGroup>
     <ClCompile Include="ATD_on_C_and_CPP.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="prototypes.h" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

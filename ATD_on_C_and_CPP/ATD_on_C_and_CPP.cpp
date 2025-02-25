@@ -294,3 +294,55 @@ void edit_order(struct Order* editable, const char* date_of_return, struct Reade
 void edit_fine(struct Fine* editable) {
 	editable->is_paid = 1;
 }
+
+
+int main() {
+	int hwmnybooks;
+	setlocale(LC_ALL, "Rus");
+
+	Author Lary;
+	Lary.input();
+	Lary.output();
+
+	std::cout << "Солько добавить книг?: ";
+	std::cin >> hwmnybooks;
+	std::cin.ignore();
+
+	Book* Gary = new Book[hwmnybooks];
+	for (int i = 0; i < hwmnybooks; ++i) {
+		std::cout << "N" << (i + 1) << ": ";
+		Gary[i].input(Lary.getId());
+		Lary.addBook(Gary[i].getId()); // Добавление книги к автору
+	}
+
+	// Вывод данных всех книг
+	for (int i = 0; i < hwmnybooks; ++i) {
+		Gary[i].output();
+	}
+	Lary.output();
+
+	Reader Mary;
+	Mary.input();
+	Mary.output();
+
+	Order Pery;
+	Pery.input(Mary.getId(), Gary->getId());
+	Pery.output();
+
+	// Пример редактирования заказа
+	Pery.edit("21.11.2121");
+	Pery.output();
+
+	Fine Jery;
+	Jery.input(Mary.getId());
+	Jery.output();
+
+	// Пример редактирования штрафа
+	Jery.edit();
+	Jery.output();
+
+	// Освобождение памяти
+	delete[] Gary;
+
+	return 0;
+}
