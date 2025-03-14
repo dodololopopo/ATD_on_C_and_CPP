@@ -304,9 +304,18 @@ int main() {
     Lary.input();
     Lary.output();
 
+    std::cout << "\n\n" << "Число книг от данного автора: " << Lary.get_books_count() << "\n\n";
+
+    show_id_to_bkcnt(Lary);
+
+    //демонстрация дружественной функции
+    Lary.increment();
+    Author::show_amount_of_authors();
+
     std::cout << "Солько добавить книг?: ";
     std::cin >> hwmnybooks;
     std::cin.ignore();
+    if (hwmnybooks < 2) hwmnybooks = 2;
 
     Book* Gary = new Book[hwmnybooks];
     for (int i = 0; i < hwmnybooks; ++i) {
@@ -315,11 +324,28 @@ int main() {
         Lary.addBook(Gary[i].getId()); // Добавление книги к автору
     }
 
+    std::cout << "\n\n" << "Число книг от данного автора: " << Lary.get_books_count() << "\n\n";
+
     // Вывод данных всех книг
     for (int i = 0; i < hwmnybooks; ++i) {
         Gary[i].output();
     }
     Lary.output();
+
+    Book DuoGary;
+    DuoGary = Gary[0] + Gary[1];    //демонстрация перегрузки, создающей дилогию
+    DuoGary.output();
+    DuoGary++;              //демонстрация перегрузки, преключающей статус доступности
+    DuoGary.output();
+
+    Author Lary2;
+    Lary2.input();
+    Lary2.output();
+
+    //демонстрация дружественной функции
+    Lary2.increment();
+    Author::show_amount_of_authors();
+
 
     Reader Mary;
     Mary.input();
@@ -341,8 +367,10 @@ int main() {
     Jery.edit();
     Jery.output();
 
+    ++Jery;
+    Jery.output();  //демонстрация перегрузки, переключающей статус "оплачено"
+
     // Освобождение памяти
     delete[] Gary;
 
     return 0;
-}
