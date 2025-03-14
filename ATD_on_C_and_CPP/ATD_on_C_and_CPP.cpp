@@ -6,31 +6,30 @@
 #define DDMMYYYY_LENTH 11
 
 class Author {
+    friend void show_id_to_bkcnt(const Author&);
 private:
     int id;                         //id автора
     int* book_ids;                  //id книг
     int books_count;                //счетчик книг
-    char* name;                     //имя автора
-    char birthdate[DDMMYYYY_LENTH]; //дата рождения
+    std::string name;                     //имя автора
+    std::string birthdate; //дата рождения
 
 public:
+    static int amount_of_authors;   //общее число авторов
+    
     Author() : book_ids(nullptr), books_count(0) {}
 
     ~Author() {
         free(book_ids);
-        free(name);
     }
 
     //ввод автора
     void input() {
-        char temp_name[25];
         std::cout << "[  Автор  ]\n" << "Введите имя: ";
-        std::cin.getline(temp_name, 25);
-        name = (char*)malloc(strlen(temp_name) + 1);
-        strcpy(name, temp_name);
+        std::cin >> name;
 
         std::cout << "Введите дату рождения дд.мм.гггг: ";
-        std::cin.getline(birthdate, DDMMYYYY_LENTH);
+        std::cin >> birthdate;
 
         std::cout << "Введите id автора: ";
         std::cin >> id;
@@ -63,8 +62,27 @@ public:
     }
 
     //выдача id автора
-    int getId() const {
-        return id;
+    int* getId() {
+        return &id;
+    }
+
+    int& get_books_count(){
+        return books_count;
+    }
+
+    //при добавлении автора их общее число растет
+    void increment() {
+        amount_of_authors++;
+    }
+
+    //при удалении автора их общее число уменьшается
+    void decrement() {
+        amount_of_authors--;
+    }
+
+    //отображение общего числа авторов
+    static void show_amount_of_authors() {
+        std::cout << "\n\n" << "Всего авторов: " << amount_of_authors << "\n\n";
     }
 };
 
@@ -73,28 +91,23 @@ private:
     int id;                 //id книги
     bool is_available;      //статус доступности книги
     int author_id;          //id фвтора
-    char* title;            //название книги
-    char published_year[5]; //год публикации
+    std::string title;            //название книги
+    std::string published_year; //год публикации
 
 public:
-    Book() : title(nullptr), is_available(true) {}
+    Book() : is_available(true) {}
 
-    ~Book() {
-        free(title);
-    }
+    ~Book() {}
 
     //ввод книги
     void input(int author_id) {
         this->author_id = author_id;
 
-        char temp_title[25];
         std::cout << "[  Книга  ]\n" << "Введите название: ";
-        std::cin.getline(temp_title, 25);
-        title = (char*)malloc(strlen(temp_title) + 1);
-        strcpy(title, temp_title);
+        std::cin >> title;
 
         std::cout << "Введите год публикации: ";
-        std::cin.getline(published_year, 5);
+        std::cin >> published_year;
 
         std::cout << "Введите id книги: ";
         std::cin >> id;
@@ -120,37 +133,48 @@ public:
     int getId() const {
         return id;
     }
-
+    
+    //перегрузка "+" для создания дилогии книг
+    Book operator+(const Book& other) const {
+        Book duology;
+        duology.author_id = this->author_id;
+        std::cout << "\n\nСоставляем дилогию" << "\nВведите id: ";
+        std::cin >> duology.id;
+        duology.is_available = true;
+        duology.title = "Дилогия " + this->title + other.title;
+        std::cout << "Год публикации: ";
+        std::cin >> duology.published_year;
+        return duology;
+    }
+    
+    //перегрузка "++" постфиксно для переключения доступности
+    Book operator++(int) {
+        Book temp = *this;
+        if (is_available == true) is_available = false;
+        else is_available = true;
+        return *this;
+     }
 };
 
 class Reader {
 private:
     int id;                 //id читателя
     int borrowed_book_id;   //id занятой книги
-    char* name;             //имя
-    char* email;            //эл. почта
+    std::string name;             //имя
+    std::string email;            //эл. почта
 
 public:
-    Reader() : name(nullptr), email(nullptr), borrowed_book_id(0) {}
+    Reader() : borrowed_book_id(0) {}
 
-    ~Reader() {
-        free(name);
-        free(email);
-    }
+    ~Reader() {}
 
     //ввод читателя
     void input() {
-        char temp_name[25];
-        char temp_email[35];
         std::cout << "[  Читатель  ]\n" << "Введите имя: ";
-        std::cin.getline(temp_name, 25);
-        name = (char*)malloc(strlen(temp_name) + 1);
-        strcpy(name, temp_name);
+        std::cin >> name;
 
         std::cout << "Введите email: ";
-        std::cin.getline(temp_email, 35);
-        email = (char*)malloc(strlen(temp_email) + 1);
-        strcpy(email, temp_email);
+        std::cin >> email;
 
         std::cout << "Введите id читателя: ";
         std::cin >> id;
@@ -179,13 +203,11 @@ private:
     int id;                             //id запроса
     int reader_id;                      //id читателя
     int book_id;                        //id запрашиваемой
-    char orderdate[DDMMYYYY_LENTH];     //дата запроса
-    char returndate[DDMMYYYY_LENTH];    //дата возврата
+    std::string orderdate;     //дата запроса
+    std::string returndate;    //дата возврата
 
 public:
-    Order() {
-        strcpy(returndate, "unreturned");
-    }
+    Order() {}
 
     //ввод запроса
     void input(int reader_id, int book_id) {
@@ -197,7 +219,7 @@ public:
         std::cin.ignore();
 
         std::cout << "дата запроса дд.мм.гггг: ";
-        std::cin.getline(orderdate, DDMMYYYY_LENTH);
+        std::cin >> orderdate;
     }
 
     //вывод запроса
@@ -211,8 +233,8 @@ public:
     }
 
     //добавление даты возврата
-    void edit(const char* return_date) {
-        strcpy(returndate, return_date);
+    void edit(std::string return_date) {
+        this->returndate = return_date;
     }
 };
 
@@ -222,14 +244,12 @@ private:
     int reader_id;  //id читателя
     int amount;     //размер штрафа
     bool is_paid;   //оплачен ли штраф
-    char* reason;   //причина штрафа
+    std::string reason;   //причина штрафа
 
 public:
-    Fine() : reason(nullptr), is_paid(false) {}
+    Fine() : is_paid(false) {}
 
-    ~Fine() {
-        free(reason);
-    }
+    ~Fine() {}
 
     //ввод штрафа
     void input(int reader_id) {
@@ -242,11 +262,8 @@ public:
         std::cin >> id;
         std::cin.ignore();
 
-        char temp_reason[150];
         std::cout << "Причина штрафа: ";
-        std::cin.getline(temp_reason, 150);
-        reason = (char*)malloc(strlen(temp_reason) + 1);
-        strcpy(reason, temp_reason);
+        std::cin >> reason;
     }
 
     //вывод штрафа
@@ -263,7 +280,21 @@ public:
     void edit() {
         is_paid = true;
     }
+
+    //перегрузка "++" префиксно для переключения статуса оплаты
+    Fine& operator++(){
+        if (is_paid == true) is_paid = false;
+        else is_paid = true;
+        return *this;
+    }
+
 };
+
+int Author::amount_of_authors = 0;
+
+void show_id_to_bkcnt(const Author& smb) {
+    std::cout << "Автор: " << smb.name << ";    id: " << smb.id << ";    Книг: " << smb.books_count << "\n";
+}
 
 int main() {
     int hwmnybooks;
@@ -280,7 +311,7 @@ int main() {
     Book* Gary = new Book[hwmnybooks];
     for (int i = 0; i < hwmnybooks; ++i) {
         std::cout << "N" << (i + 1) << ": ";
-        Gary[i].input(Lary.getId());
+        Gary[i].input(*Lary.getId());
         Lary.addBook(Gary[i].getId()); // Добавление книги к автору
     }
 
