@@ -392,6 +392,7 @@ int main() {
     std::cin.ignore();
     if (hwmnybooks < 2) hwmnybooks = 2;
 
+    //работа с одномерным массивом
     Book* Gary = new Book[hwmnybooks];
     for (int i = 0; i < hwmnybooks; ++i) {
         std::cout << "N" << (i + 1) << ": ";
@@ -422,28 +423,38 @@ int main() {
     Author::show_amount_of_authors();
 
 
-    Reader Mary;
-    Mary.input();
-    Mary.output();
+
+    //работа с двумерным массивом
+    Reader reader[2];
+    Fine fine[2][2];
+    for (int i = 0; i < 2; ++i) {
+        reader[i].input();
+        for (int j = 0; j < 2; ++j) {
+            fine[i][j].input(reader[i].getId());
+        }
+    }
+
+    for (int i = 0; i < 2; ++i) {
+        reader[i].output();
+        for (int j = 0; j < 2; ++j) {
+            fine[i][j].output();
+        }
+    }
+
+    // Пример редактирования штрафа
+    fine[0][0].edit();
+    fine[0][0].output();
+
+    ++fine[0][1];
+    fine[0][1].output();  //демонстрация перегрузки, переключающей статус "оплачено"
 
     Order Pery;
-    Pery.input(Mary.getId(), Gary->getId());
+    Pery.input(reader[0].getId(), Gary->getId());
     Pery.output();
 
     // Пример редактирования заказа
     Pery.edit("21.11.2121");
     Pery.output();
-
-    Fine Jery;
-    Jery.input(Mary.getId());
-    Jery.output();
-
-    // Пример редактирования штрафа
-    Jery.edit();
-    Jery.output();
-
-    ++Jery;
-    Jery.output();  //демонстрация перегрузки, переключающей статус "оплачено"
 
     // Освобождение памяти
     delete[] Gary;
