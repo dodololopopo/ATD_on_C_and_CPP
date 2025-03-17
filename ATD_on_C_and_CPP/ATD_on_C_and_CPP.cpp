@@ -25,15 +25,29 @@ public:
 
     //ввод автора
     void input() {
-        std::cout << "[  Автор  ]\n" << "Введите имя: ";
-        std::cin >> name;
+        try {
+            std::cout << "[  Автор  ]\n" << "Введите имя: ";
+            std::cin >> name;
 
-        std::cout << "Введите дату рождения дд.мм.гггг: ";
-        std::cin >> birthdate;
+            std::cout << "Введите дату рождения дд.мм.гггг: ";
+            std::cin >> birthdate;
 
-        std::cout << "Введите id автора: ";
-        std::cin >> id;
-        std::cin.ignore();
+            std::cout << "Введите id автора: ";
+            std::cin >> id;
+            if (std::cin.fail()) {
+                throw std::runtime_error("Ошибка: ID должен быть числом. Повторите ввод: ");
+            }
+            else if (id < 1) {
+                throw std::runtime_error("Ошибка: ID должен быть положительным числом. Повторите ввод: ");
+            }
+            std::cin.ignore();
+        }
+        catch (const std::runtime_error& e) {
+            std::cerr << e.what() << std::endl;
+            std::cin.clear(); // Сброс состояния потока
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Очистка буфера
+            std::cin >> id;
+        }
     }
 
     //вывод автора
@@ -56,10 +70,17 @@ public:
 
     //добавление книги
     void addBook(int book_id) {
+        if (book_id < 0) {
+            throw std::runtime_error("Ошибка: ID книги не может быть отрицательным.");
+        }
         books_count++;
         book_ids = (int*)realloc(book_ids, books_count * sizeof(int));
+        if (!book_ids) {
+            throw std::runtime_error("Ошибка: Не удалось выделить память для ID книг.");
+        }
         book_ids[books_count - 1] = book_id;
     }
+
 
     //выдача id автора
     int* getId() {
@@ -101,17 +122,30 @@ public:
 
     //ввод книги
     void input(int author_id) {
-        this->author_id = author_id;
+        try {
+            this->author_id = author_id;
 
-        std::cout << "[  Книга  ]\n" << "Введите название: ";
-        std::cin >> title;
+            std::cout << "[  Книга  ]\n" << "Введите название: ";
+            std::cin >> title;
 
-        std::cout << "Введите год публикации: ";
-        std::cin >> published_year;
+            std::cout << "Введите год публикации: ";
+            std::cin >> published_year;
 
-        std::cout << "Введите id книги: ";
-        std::cin >> id;
-        std::cin.ignore();
+            std::cout << "Введите id книги: ";
+            std::cin >> id;
+            if (std::cin.fail()) {
+                throw std::runtime_error("Ошибка: ID должен быть числом. Повторите ввод: ");
+            }
+            else if (id < 1) {
+                throw std::runtime_error("Ошибка: ID должен быть положительным числом. Повторите ввод: ");
+            }
+            std::cin.ignore();
+        }
+        catch (const std::runtime_error& e) {
+            std::cerr << e.what() << std::endl;
+            std::cin.clear(); // Сброс состояния потока
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Очистка буфера
+        }
     }
 
     //вывод книги
@@ -170,17 +204,30 @@ public:
 
     //ввод читателя
     void input() {
-        std::cout << "[  Читатель  ]\n" << "Введите имя: ";
-        std::cin >> name;
+        try {
+            std::cout << "[  Читатель  ]\n" << "Введите имя: ";
+            std::cin >> name;
 
-        std::cout << "Введите email: ";
-        std::cin >> email;
+            std::cout << "Введите email: ";
+            std::cin >> email;
 
-        std::cout << "Введите id читателя: ";
-        std::cin >> id;
-        std::cin.ignore();
+            std::cout << "Введите id читателя: ";
+            std::cin >> id;
+            if (std::cin.fail()) {
+                throw std::runtime_error("Ошибка: ID должен быть числом. Повторите ввод: ");
+            }
+            else if (id < 1) {
+                throw std::runtime_error("Ошибка: ID должен быть положительным числом. Повторите ввод: ");
+            }
+            std::cin.ignore();
+        }
+        catch (const std::runtime_error& e) {
+            std::cerr << e.what() << std::endl;
+            std::cin.clear(); // Сброс состояния потока
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Очистка буфера
+            std::cin >> id;
+        }
     }
-
     //вывод читателя
     void output() const {
         std::cout << "Читатель:\n";
@@ -214,12 +261,26 @@ public:
         this->reader_id = reader_id;
         this->book_id = book_id;
 
-        std::cout << "[  Запрос  ]\n" << "Введите id запроса: ";
-        std::cin >> id;
-        std::cin.ignore();
+        try {
+            std::cout << "[  Запрос  ]\n" << "Введите id запроса: ";
+            std::cin >> id;
+            if (std::cin.fail()) {
+                throw std::runtime_error("Ошибка: ID должен быть числом. Повторите ввод: ");
+            }
+            else if (id < 1) {
+                throw std::runtime_error("Ошибка: ID должен быть положительным числом. Повторите ввод: ");
+            }
+            std::cin.ignore();
 
-        std::cout << "дата запроса дд.мм.гггг: ";
-        std::cin >> orderdate;
+            std::cout << "Дата запроса дд.мм.гггг: ";
+            std::cin >> orderdate;
+        }
+        catch (const std::runtime_error& e) {
+            std::cerr << e.what() << std::endl;
+            std::cin.clear(); // Сброс состояния потока
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Очистка буфера
+            std::cin >> id;
+        }
     }
 
     //вывод запроса
@@ -255,15 +316,29 @@ public:
     void input(int reader_id) {
         this->reader_id = reader_id;
 
-        std::cout << "[  Штраф  ]\n" << "Введите объем штрафа: ";
-        std::cin >> amount;
+        try {
+            std::cout << "[  Штраф  ]\n" << "Введите объем штрафа: ";
+            std::cin >> amount;
 
-        std::cout << "Введите id штрафа: ";
-        std::cin >> id;
-        std::cin.ignore();
+            std::cout << "Введите id штрафа: ";
+            std::cin >> id;
+            if (std::cin.fail()) {
+                throw std::runtime_error("Ошибка: ID должен быть числом. Повторите ввод: ");
+            }
+            else if (id < 1) {
+                throw std::runtime_error("Ошибка: ID должен быть положительным числом. Повторите ввод: ");
+            }
+            std::cin.ignore();
 
-        std::cout << "Причина штрафа: ";
-        std::cin >> reason;
+            std::cout << "Причина штрафа: ";
+            std::cin >> reason;
+        }
+        catch (const std::runtime_error& e) {
+            std::cerr << e.what() << std::endl;
+            std::cin.clear(); // Сброс состояния потока
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Очистка буфера
+            std::cin >> id;
+        }
     }
 
     //вывод штрафа
@@ -374,3 +449,4 @@ int main() {
     delete[] Gary;
 
     return 0;
+}
