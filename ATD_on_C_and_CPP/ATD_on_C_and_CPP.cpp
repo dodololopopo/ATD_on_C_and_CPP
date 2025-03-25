@@ -554,7 +554,7 @@ int main() {
 
     Author Lary;
     Lary.input();
-    Lary.output();
+    std::cout << Lary;
 
     std::cout << "\n\n" << "Число книг от данного автора: " << Lary.get_books_count() << "\n\n";
 
@@ -563,7 +563,52 @@ int main() {
     //демонстрация дружественной функции
     Lary.increment();
     Author::show_amount_of_authors();
-    
+
+
+    //демонстрация работы с абстрактым классом
+    Literature* liblib = new Book;
+    liblib->update_lib();
+    delete liblib;
+
+
+    //демонстрация работы с шаблоном класса
+    Collection<Book> CollectBooks;
+
+    //демонстрация с производным классом
+    EBook Eb;
+    Eb.input(*Lary.getId());
+    CollectBooks.add(Eb);
+    Lary.addBook(Eb.getId());
+    Eb.output();
+    Eb.output("shorter");
+
+
+    //перегрузка опреатора "="
+    Book Book_for_Eb;
+    Book_for_Eb.input(*Lary.getId());
+    CollectBooks.add(Book_for_Eb);
+    Lary.addBook(Book_for_Eb.getId());
+    std::cout << Eb;
+    Eb = Book_for_Eb;
+    std::cout << Eb;
+    std::cout << "\n\nСписок книг:\n";
+    std::cout << CollectBooks;
+
+
+    //демонстрация с виртуальными функциями
+    Book* book = new EBook();
+    book->input(*Lary.getId());
+    book->display();
+
+    Book baseBook;
+    EBook eBook;
+    baseBook.input(*Lary.getId());
+    eBook.input(*Lary.getId());
+    baseBook = eBook;
+    baseBook.display();
+
+
+
     std::cout << "Солько добавить книг?: ";
     std::cin >> hwmnybooks;
     std::cin.ignore();
@@ -581,19 +626,19 @@ int main() {
 
     // Вывод данных всех книг
     for (int i = 0; i < hwmnybooks; ++i) {
-        Gary[i].output();
+        std::cout << Gary[i];
     }
-    Lary.output();
+    std::cout << Lary;
 
     Book DuoGary;
     DuoGary = Gary[0] + Gary[1];    //демонстрация перегрузки, создающей дилогию
-    DuoGary.output();
+    std::cout << DuoGary;
     DuoGary++;              //демонстрация перегрузки, преключающей статус доступности
-    DuoGary.output();
+    std::cout << DuoGary;
 
     Author Lary2;
     Lary2.input();
-    Lary2.output();
+    std::cout << Lary2;
 
     //демонстрация дружественной функции
     Lary2.increment();
@@ -612,26 +657,26 @@ int main() {
     }
 
     for (int i = 0; i < 2; ++i) {
-        reader[i].output();
+        std::cout << reader[i];
         for (int j = 0; j < 2; ++j) {
-            fine[i][j].output();
+            std::cout << fine[i][j];
         }
     }
 
     // Пример редактирования штрафа
     fine[0][0].edit();
-    fine[0][0].output();
+    std::cout << fine[0][0];
 
     ++fine[0][1];
-    fine[0][1].output();  //демонстрация перегрузки, переключающей статус "оплачено"
+    std::cout << fine[0][1];  //демонстрация перегрузки, переключающей статус "оплачено"
 
     Order Pery;
     Pery.input(reader[0].getId(), Gary->getId());
-    Pery.output();
+    std::cout << Pery;
 
     // Пример редактирования заказа
     Pery.edit("21.11.2121");
-    Pery.output();
+    std::cout << Pery;
 
     // Освобождение памяти
     delete[] Gary;
