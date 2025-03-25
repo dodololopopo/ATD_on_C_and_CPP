@@ -3,7 +3,36 @@
 #include <cstring>
 #include <cstdlib>
 #include <locale>
+#include <vector>
 #define DDMMYYYY_LENTH 11
+
+
+template <typename T>
+class Collection {
+private:
+    std::vector<T> items; // Вектор для хранения элементов коллекции
+
+public:
+    // Добавление элемента в коллекцию
+    void add(const T& item) {
+        items.push_back(item);
+    }
+
+    // Вывод всех элементов коллекции
+    void output() const {
+        for (const auto& item : items) {
+            item.output();
+        }
+    }
+
+    // Переопределение оператора <<
+    friend std::ostream& operator<<(std::ostream& os, const Collection<T>& collection) {
+        for (const auto& item : collection.items) {
+            os << item; // Используем оператор << для каждого элемента
+        }
+        return os;
+    }
+};
 
 class Author {
     friend void show_id_to_bkcnt(const Author&);
@@ -105,10 +134,34 @@ public:
     static void show_amount_of_authors() {
         std::cout << "\n\n" << "Всего авторов: " << amount_of_authors << "\n\n";
     }
+
+    // Переопределение оператора <<
+    friend std::ostream& operator<<(std::ostream& os, const Author& author) {
+        os << "Автор:\n";
+        os << "  Имя - " << author.name << "\n";
+        os << "  Дата рождения - " << author.birthdate << "\n";
+        os << "  ID автора - " << author.id << "\n";
+        if (author.books_count) {
+            os << "  ID книг:\n";
+            for (int i = 0; i < author.books_count; i++) {
+                os << "    - " << author.book_ids[i] << "\n";
+            }
+        }
+        else {
+            os << "  Нет книг от данного автора\n";
+        }
+        return os;
+    }
 };
 
-class Book {
-private:
+
+class Literature {
+public:
+    virtual void update_lib() const = 0;
+};
+
+class Book : public Literature{
+protected:
     int id;                 //id книги
     bool is_available;      //статус доступности книги
     int author_id;          //id фвтора
@@ -167,6 +220,22 @@ public:
     int getId() const {
         return id;
     }
+
+    std::string get_title() {
+        return title;
+    }
+    
+    std::string get_published_year() {
+        return published_year;
+    }
+
+    bool get_avaliability() {
+        return is_available;
+    }
+
+    int get_author_id() {
+        return author_id;
+    }
     
     //перегрузка "+" для создания дилогии книг
     Book operator+(const Book& other) const {
@@ -188,6 +257,80 @@ public:
         else is_available = true;
         return *this;
      }
+
+    virtual void display() {
+        std::cout << "Книга: " << title << "\n\n";
+    }
+
+    void update_lib() const override {
+        std::cout << "== Библиотека обновлена ==\n";
+        std::cout << "Причина: добавлена книга\n\n";
+    }
+
+    friend std::ostream& operator<<(std::ostream& os, const Book& book) {
+        os << "Книга:\n";
+        os << "  Название - " << book.title << "\n";
+        os << "  Год публикации - " << book.published_year << "\n";
+        os << "  ID книги - " << book.id << "\n";
+        os << "  ID автора - " << book.author_id << "\n";
+        os << "  Статус - " << (book.is_available ? "Доступна" : "Не доступна") << "\n";
+        return os;
+    }
+};
+
+class EBook : public Book {
+private:
+    std::string file_format; // формат файла (например, PDF, EPUB)
+    double file_size;        // размер файла в мегабайтах
+
+public:
+    EBook() : Book(), file_size(0.0), file_format("-") {}
+
+    // Ввод данных для электронной книги
+    void input(int author_id) {
+        Book::input(author_id); // Вызов метода ввода из базового класса
+        std::cout << "Введите формат файла (например, PDF, EPUB): ";
+        std::cin >> file_format;
+
+        std::cout << "Введите размер файла (в МБ): ";
+        std::cin >> file_size;
+    }
+
+    //перегрузка функции вывода с методом базового класса и без
+    void output() {
+        Book::output(); // Вызов метода вывода из базового класса
+        std::cout << "  Формат файла - " << file_format << "\n";
+        std::cout << "  Размер файла - " << file_size << " МБ\n\n";
+    }
+    
+    void output(std::string) {
+        std::cout << "[ Книга ]\n";
+        std::cout << "  Название - " << title << "\n";
+        std::cout << "  Формат файла - " << file_format << "\n";
+        std::cout << "  Размер файла - " << file_size << " МБ\n\n";
+    }
+
+    EBook& operator=(Book& other){
+        id = other.getId();
+        is_available = other.get_avaliability();
+        author_id = other.get_author_id();
+        title = other.get_title();
+        published_year = other.get_published_year();
+        return *this;
+    }
+
+    void display() override {
+        std::cout << "Электронная книга: " << title << ", Формат: " << file_format << "\n\n";
+    }
+
+
+    // Переопределение оператора <<
+    friend std::ostream& operator<<(std::ostream& os, const EBook& ebook) {
+        os << static_cast<const Book&>(ebook); // Вызов оператора << для базового класса
+        os << "  Формат файла - " << ebook.file_format << "\n";
+        os << "  Размер файла - " << ebook.file_size << " МБ\n";
+        return os;
+    }
 };
 
 class Reader {
@@ -243,6 +386,18 @@ public:
     int getId() const {
         return id;
     }
+
+    // Переопределение оператора <<
+    friend std::ostream& operator<<(std::ostream& os, const Reader& reader) {
+        os << "Читатель:\n";
+        os << "  Имя - " << reader.name << "\n";
+        os << "  Почта - " << reader.email << "\n";
+        os << "  ID читателя - " << reader.id << "\n";
+        os << "  ID занятой книги - ";
+        if (reader.borrowed_book_id == 0) os << "Книг не занято" << "\n";
+        else os << reader.borrowed_book_id << "\n";
+        return os;
+    }
 };
 
 class Order {
@@ -296,6 +451,17 @@ public:
     //добавление даты возврата
     void edit(std::string return_date) {
         this->returndate = return_date;
+    }
+
+    // Переопределение оператора <<
+    friend std::ostream& operator<<(std::ostream& os, const Order& order) {
+        os << "Запрос:\n";
+        os << "  ID запроса - " << order.id << "\n";
+        os << "  ID книги - " << order.book_id << "\n";
+        os << "  ID читателя - " << order.reader_id << "\n";
+        os << "  Дата запроса - " << order.orderdate << "\n";
+        os << "  Дата возврата - " << order.returndate << "\n";
+        return os;
     }
 };
 
@@ -363,6 +529,17 @@ public:
         return *this;
     }
 
+
+    // Переопределение оператора <<
+    friend std::ostream& operator<<(std::ostream& os, const Fine& fine) {
+        os << "Штраф:\n";
+        os << "  ID штрафа - " << fine.id << "\n";
+        os << "  ID читателя - " << fine.reader_id << "\n";
+        os << "  Объем штрафа - " << fine.amount << " $\n";
+        os << "  Статус  - " << (fine.is_paid ? "Оплачен" : "Не оплачен") << "\n";
+        os << "  Причина - " << fine.reason << "\n";
+        return os;
+    }
 };
 
 int Author::amount_of_authors = 0;
@@ -386,7 +563,7 @@ int main() {
     //демонстрация дружественной функции
     Lary.increment();
     Author::show_amount_of_authors();
-
+    
     std::cout << "Солько добавить книг?: ";
     std::cin >> hwmnybooks;
     std::cin.ignore();
