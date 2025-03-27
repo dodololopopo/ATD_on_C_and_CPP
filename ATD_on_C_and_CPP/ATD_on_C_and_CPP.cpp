@@ -1,27 +1,35 @@
 ﻿#define _CRT_SECURE_NO_WARNINGS
 #include <iostream>
-#include <cstring>
+#include <string>
 #include <cstdlib>
 #include <locale>
 #include <vector>
+#include <algorithm>
 #define DDMMYYYY_LENTH 11
 
+
+class Sortable {
+public:
+    virtual std::string get_published_year() const = 0;
+    virtual std::string get_title() const = 0;
+    virtual ~Sortable() = default;
+};
 
 template <typename T>
 class Collection {
 private:
-    std::vector<T> items; // Вектор для хранения элементов коллекции
+    std::vector<std::shared_ptr<T>> items; // Вектор для хранения элементов коллекции
 
 public:
     // Добавление элемента в коллекцию
-    void add(const T& item) {
+    void add(std::shared_ptr<T> item) {
         items.push_back(item);
     }
 
     // Вывод всех элементов коллекции
     void output() const {
         for (const auto& item : items) {
-            item.output();
+            item->output();
         }
     }
 
@@ -31,6 +39,21 @@ public:
             os << item; // Используем оператор << для каждого элемента
         }
         return os;
+    }
+    void sortByPublishedYear() {
+        std::sort(items.begin(), items.end(), [](const std::shared_ptr<T>& a, const std::shared_ptr<T>& b) {
+            return a->get_published_year() < b->get_published_year();
+            });
+    }
+
+    std::shared_ptr<T> findByTitle(const std::string& title) {
+        auto it = std::find_if(items.begin(), items.end(), [&title](const std::shared_ptr<T>& book) {
+            return book->get_title() == title;
+            });
+        if (it != items.end()) {
+            return *it;
+        }
+        return nullptr;
     }
 };
 
@@ -160,7 +183,7 @@ public:
     virtual void update_lib() const = 0;
 };
 
-class Book : public Literature{
+class Book : public Literature, public Sortable{
 protected:
     int id;                 //id книги
     bool is_available;      //статус доступности книги
@@ -179,7 +202,7 @@ public:
             this->author_id = author_id;
 
             std::cout << "[  Книга  ]\n" << "Введите название: ";
-            std::cin >> title;
+            std::getline(std::cin, title);
 
             std::cout << "Введите год публикации: ";
             std::cin >> published_year;
@@ -202,7 +225,7 @@ public:
     }
 
     //вывод книги
-    void output() const {
+    virtual void output() const {
         std::cout << "Книга:\n";
         std::cout << "  Название - " << title << "\n";
         std::cout << "  Год публикации - " << published_year << "\n";
@@ -221,11 +244,11 @@ public:
         return id;
     }
 
-    std::string get_title() {
+    std::string get_title() const override{
         return title;
     }
     
-    std::string get_published_year() {
+    std::string get_published_year() const override {
         return published_year;
     }
 
@@ -297,7 +320,7 @@ public:
     }
 
     //перегрузка функции вывода с методом базового класса и без
-    void output() {
+    void output() const override {
         Book::output(); // Вызов метода вывода из базового класса
         std::cout << "  Формат файла - " << file_format << "\n";
         std::cout << "  Размер файла - " << file_size << " МБ\n\n";
@@ -574,20 +597,44 @@ int main() {
     //демонстрация работы с шаблоном класса
     Collection<Book> CollectBooks;
 
+    //демонстрация сортировки и поиска
+    auto a = std::make_shared<Book>();
+    auto b = std::make_shared<Book>();
+    auto c = std::make_shared<EBook>();
+
+    a->input(*Lary.getId());
+    b->input(*Lary.getId());
+    c->input(*Lary.getId());
+
+    CollectBooks.add(a);
+    CollectBooks.add(b);
+    CollectBooks.add(c);
+
+    CollectBooks.output();
+    std::cout << "Сортируем список:\n";
+    CollectBooks.sortByPublishedYear();
+    CollectBooks.output();
+    
+    std::cout << "\nПоиск книги\nВведите название:";
+    std::string searchtitle;
+    std::cin.ignore();
+    std::getline(std::cin, searchtitle);
+    CollectBooks.findByTitle(searchtitle)->output();
+
     //демонстрация с производным классом
-    EBook Eb;
-    Eb.input(*Lary.getId());
+    auto Eb = std::make_shared<EBook>();
+    Eb->input(*Lary.getId());
     CollectBooks.add(Eb);
-    Lary.addBook(Eb.getId());
-    Eb.output();
-    Eb.output("shorter");
+    Lary.addBook(Eb->getId());
+    Eb->output();
+    Eb->output("shorter");
 
 
     //перегрузка опреатора "="
-    Book Book_for_Eb;
-    Book_for_Eb.input(*Lary.getId());
+    auto Book_for_Eb = std::make_shared<EBook>();
+    Book_for_Eb->input(*Lary.getId());
     CollectBooks.add(Book_for_Eb);
-    Lary.addBook(Book_for_Eb.getId());
+    Lary.addBook(Book_for_Eb->getId());
     std::cout << Eb;
     Eb = Book_for_Eb;
     std::cout << Eb;
